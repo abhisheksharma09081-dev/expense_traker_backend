@@ -3,27 +3,31 @@ name: Spring Boot CI
 on:
   push:
     branches: [main]
+
   pull_request:
     branches: [main]
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up Java 21
+      - name: Setup Java 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: 21
           cache: maven
 
-      - name: Build project
+      - name: Build & Test
         run: mvn clean verify
 
-      - name: Show Surefire Reports
-        if: failure()
-        run: |
-          find target/surefire-reports -type f -exec echo "===== {} =====" \; -exec cat {} \;
+      - name: Upload JAR Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: expense-tracker-jar
+          path: target/*.jar
